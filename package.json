@@ -10,7 +10,7 @@
     "prisma-dev-reset": "dotenv -e .env.local prisma migrate reset --",
     "prisma-dev-migrate": "dotenv -e .env.local prisma migrate dev --",
     "prisma-dev-seed": "dotenv -e .env.local prisma db seed",
-    "vercel-build": "prisma generate && prisma migrate deploy && next build"
+    "vercel-build": "prisma generate && prisma migrate deploy && prisma db seed && next build"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
