@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import { SessionValue, getSession } from "./app/services/auth";
 
 const checkPathPermission = (session: SessionValue, path: string) => {
-  if (path.startsWith("/api/admin") && session.user.role.name !== "admin") {
+  if (path.startsWith("/api/admin") && session.user?.role?.name !== "admin") {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 

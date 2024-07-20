@@ -49,7 +49,8 @@ export const login = async ({
   const valid = compareSync(password, user.password);
   if (!valid) throw ErrorObj.INCORRECT_PASSWORD;
 
-  session.user = userResponse(user);
+  const a = userResponse(user);
+  session.user = a;
   await session.save();
   return user;
 };

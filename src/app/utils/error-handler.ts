@@ -1,5 +1,4 @@
 import { Prisma } from "@prisma/client";
-import startCase from "lodash/startCase";
 import z from "zod";
 
 interface ErrorObj {
@@ -26,7 +25,7 @@ const errorHandler = (error: unknown) => {
   if (error instanceof z.ZodError) {
     return Response.json(
       {
-        error: `[${startCase(error.issues[0].path.join("-"))}]: ${
+        error: `[${error.issues[0].path.join("-")}]: ${
           error.issues[0].message
         }`,
       },

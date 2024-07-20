@@ -7,7 +7,7 @@ export const listUsersResponse = (users: UserWithRoles[]) => {
   });
 };
 
-export const userResponse = (user: User | UserWithRoles) => {
+export const userResponse = (user: UserWithRoles) => {
   const { password, ...rest } = user;
 
   return rest;
