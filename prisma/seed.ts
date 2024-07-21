@@ -28,6 +28,45 @@ async function main() {
       role_id: 1,
     },
   });
+
+  await prisma.product.upsert({
+    where: {
+      id: 1,
+    },
+    update: {
+      name: "Product 1",
+    },
+    create: {
+      name: "Product 1",
+      price: 1000.0,
+    },
+  });
+
+  await prisma.product.upsert({
+    where: {
+      id: 2,
+    },
+    update: {
+      name: "Product 2",
+    },
+    create: {
+      name: "Product 2",
+      price: 2000.0,
+    },
+  });
+
+  await prisma.product.upsert({
+    where: {
+      id: 3,
+    },
+    update: {
+      name: "Product 3",
+    },
+    create: {
+      name: "Product 3",
+      price: 3000.0,
+    },
+  });
 }
 
 main()

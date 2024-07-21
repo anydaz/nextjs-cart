@@ -10,13 +10,20 @@ const checkPathPermission = (session: SessionValue, path: string) => {
   return NextResponse.next();
 };
 
-const unautorizedPath = new Set(["/api/login"]);
+const unautorizedPath = new Set([
+  "/api/login",
+  "/api/products",
+  "/api/session",
+  "/api/guest_cart",
+]);
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   // skip paths that do not require authentication
-  if (unautorizedPath.has(path)) return NextResponse.next();
+  if (unautorizedPath.has(path)) {
+    return NextResponse.next();
+  }
 
   const session = await getSession();
   if (!session?.user) {

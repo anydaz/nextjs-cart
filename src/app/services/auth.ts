@@ -6,6 +6,10 @@ import { compareSync } from "bcrypt-ts";
 import { ErrorObj } from "../utils/error-handler";
 import { userResponse } from "../output/user";
 import { UserWithRoles } from "../interfaces/user";
+import { isEmpty } from "lodash";
+import { v4 as uuidv4 } from "uuid";
+
+const GUEST_SESSION = "GuestSession";
 
 export interface SessionValue {
   user: Omit<UserWithRoles, "password">;
@@ -52,5 +56,48 @@ export const login = async ({
   const a = userResponse(user);
   session.user = a;
   await session.save();
+  await destroyGuestSession();
   return user;
+};
+
+export const logout = async () => {
+  const session = await getIronSession<any>(cookies(), {
+    password: env.IRON_SESSION_PASSWORD!,
+    cookieName: env.IRON_SESSION_COOKIE_NAME!,
+  });
+  await session.destroy();
+  return session;
+};
+
+export const getGuestSession = async () => {
+  return await getIronSession<{ id: string }>(cookies(), {
+    password: env.IRON_SESSION_PASSWORD!,
+    cookieName: GUEST_SESSION,
+  });
+};
+
+export const setGuestSession = async () => {
+  const guestSession = await getIronSession<{ id: string }>(cookies(), {
+    password: env.IRON_SESSION_PASSWORD!,
+    cookieName: GUEST_SESSION,
+    cookieOptions: {
+      httpOnly: true,
+    },
+  });
+
+  if (isEmpty(guestSession)) {
+    guestSession.id = uuidv4();
+  }
+
+  await guestSession.save();
+  return guestSession;
+};
+
+const destroyGuestSession = async () => {
+  const session = await getIronSession<any>(cookies(), {
+    password: env.IRON_SESSION_PASSWORD!,
+    cookieName: GUEST_SESSION,
+  });
+  await session.destroy();
+  return session;
 };
