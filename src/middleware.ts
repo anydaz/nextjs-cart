@@ -12,6 +12,7 @@ const checkPathPermission = (session: SessionValue, path: string) => {
 
 const unautorizedPath = new Set([
   "/api/login",
+  "/api/register",
   "/api/products",
   "/api/session",
   "/api/guest_cart",

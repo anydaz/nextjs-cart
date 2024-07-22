@@ -2,6 +2,7 @@ import { User } from "@prisma/client";
 import { genSaltSync, hashSync } from "bcrypt-ts";
 import { ErrorObj } from "@/app/utils/error-handler";
 import prisma, { isActiveRecord } from "@/app/utils/prisma";
+import { bulkAddCart, destroyGuestCart, listItemOnGuestCart } from "./cart";
 
 export const listUsers = async () => {
   return await prisma.user.findMany({
@@ -41,9 +42,11 @@ export const deleteUser = async (id: number) => {
   return user;
 };
 
-export const createUser = async (
-  user: Pick<User, "role_id" | "name" | "email" | "password" | "phone_number">
-) => {
+type UserParams = Pick<
+  User,
+  "role_id" | "name" | "email" | "password" | "phone_number"
+>;
+export const createUser = async (user: UserParams) => {
   // hash password
   const salt = genSaltSync(10);
   const hash = hashSync(user.password, salt);
@@ -52,4 +55,24 @@ export const createUser = async (
   return await prisma.user.create({
     data: user,
   });
+};
+
+export const registerUser = async (user: UserParams) => {
+  const newUser = await createUser(user);
+
+  // migrate cart from guest cart to regular cart
+  const guestCart = await listItemOnGuestCart();
+  if (guestCart.length > 0) {
+    const data = guestCart.map((cart) => {
+      return {
+        product_id: cart.product_id,
+        quantity: cart.quantity,
+        user_id: newUser.id,
+      };
+    });
+    bulkAddCart(data);
+    destroyGuestCart();
+  }
+
+  return newUser;
 };

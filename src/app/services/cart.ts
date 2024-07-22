@@ -1,13 +1,15 @@
+import { CartItem, TemporaryCartItem } from "@prisma/client";
 import prisma from "../utils/prisma";
 import { getGuestSession } from "./auth";
 
+type TemporaryCartItemParam = Pick<
+  CartItem,
+  "product_id" | "user_id" | "quantity"
+>;
 export const addToGuestCart = async ({
   product_id,
   quantity,
-}: {
-  product_id: number;
-  quantity: number;
-}) => {
+}: TemporaryCartItemParam) => {
   const session = await getGuestSession();
 
   return await prisma.temporaryCartItem.upsert({
@@ -28,6 +30,15 @@ export const addToGuestCart = async ({
   });
 };
 
+export const destroyGuestCart = async () => {
+  const session = await getGuestSession();
+  return await prisma.temporaryCartItem.deleteMany({
+    where: {
+      session_id: session.id,
+    },
+  });
+};
+
 export const listItemOnGuestCart = async () => {
   const session = await getGuestSession();
 
@@ -35,5 +46,12 @@ export const listItemOnGuestCart = async () => {
     where: {
       session_id: session.id,
     },
+  });
+};
+
+type CartItemParam = Pick<CartItem, "product_id" | "user_id" | "quantity">;
+export const bulkAddCart = async (data: CartItemParam[]) => {
+  await prisma.cartItem.createMany({
+    data: data,
   });
 };
